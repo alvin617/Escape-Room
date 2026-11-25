@@ -3,172 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ESCAPE - HORROR HD</title>
+<title>ESCAPE ROOM - FINAL TANPA TIMER</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:Arial;overflow:hidden;touch-action:none}
-#hud{position:fixed;top:0;left:0;right:0;z-index:50;background:linear-gradient(#000,transparent);padding:10px;text-align:center}
-#hud h1{font-size:16px;color:#ff2222;text-shadow:0 0 10px red;letter-spacing:2px}
-#hud p{font-size:12px;color:#ddd}
-#pesan{position:fixed;top:65px;left:50%;transform:translateX(-50%);background:#ffcc00;color:#000;padding:8px 15px;border-radius:20px;font-weight:bold;font-size:13px;z-index:60;display:none;box-shadow:0 0 20px #ffcc00}
-#game{position:fixed;inset:0;background:#000}
-canvas{width:100%;height:100%;display:block;filter:contrast(1.2) brightness(0.9)}
-#vignette{position:fixed;inset:0;pointer-events:none;z-index:40;box-shadow:inset 0 0 120px 70px #000}
-#noise{position:fixed;inset:0;pointer-events:none;z-index:41;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-#joy{position:fixed;left:20px;bottom:20px;width:125px;height:125px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.4);border-radius:50%;z-index:70;backdrop-filter:blur(2px)}
-#knob{position:absolute;left:42px;top:42px;width:42px;height:42px;background:radial-gradient(#fff,#888);border-radius:50%;box-shadow:0 0 15px #fff}
-#aksi{position:fixed;right:20px;bottom:25px;z-index:70;display:flex;flex-direction:column;gap:10px;align-items:center}
-#aksi button{width:72px;height:72px;border-radius:50%;border:2px solid #fff;background:radial-gradient(#ff4444,#800000);color:#fff;font-size:26px;box-shadow:0 0 20px red}
-#aksi .kecil{width:72px;height:42px;border-radius:20px;background:#222;font-size:11px;box-shadow:none}
-#jumpscare{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:200;text-align:center}
-#jumpscare h1{font-size:140px;filter:contrast(2)}
-#awal{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-#awalBox{background:linear-gradient(#1a0000,#000);color:#fff;padding:22px;border:2px solid red;border-radius:15px;max-width:420px;box-shadow:0 0 30px red}
-#awalBox h2{color:red;text-align:center;margin-bottom:12px;font-size:20px}
-#awalBox p{font-size:13px;line-height:1.7;margin-bottom:8px;color:#ddd}
-#awalBox button{width:100%;padding:13px;background:red;color:#fff;border:none;border-radius:10px;font-weight:bold;font-size:15px;margin-top:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
+#hud{padding:10px;text-align:center;border-bottom:1px solid red}
+#hud h1{font-size:15px;color:red}
+#hud p{font-size:12px}
+#game{position:relative;width:100vw;height:calc(100vh - 70px);overflow:hidden}
+#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hot{position:absolute;border:2px dashed yellow;background:rgba(255,255,0,.15);border-radius:10px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font-size:11px;font-weight:bold;text-shadow:0 0 5px #000;z-index:10;cursor:pointer}
+.hot.done{border-color:#0f0;background:rgba(0,255,0,.2)}
+#hLemari{left:3%;top:8%;width:22%;height:78%}
+#hCermin{left:28%;top:18%;width:18%;height:62%}
+#hPintu{left:48%;top:22%;width:15%;height:58%}
+#hKasur{left:68%;top:55%;width:30%;height:40%}
+#hMeja{left:58%;top:68%;width:12%;height:25%}
+#hJendela{left:66%;top:8%;width:26%;height:42%}
+#pesan{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 14px;border-radius:12px;font-weight:bold;font-size:13px;z-index:20;display:none;text-align:center;max-width:92%}
+#invent{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);padding:8px 12px;border-radius:20px;font-size:12px;z-index:20;border:1px solid #fff;text-align:center}
+#popup{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#box{background:#fff;color:#000;padding:20px;border-radius:15px;max-width:420px;width:100%;text-align:center}
+#box h2{margin-bottom:10px}
+#box p{font-size:14px;line-height:1.6;margin-bottom:12px}
+#box input{width:100%;padding:10px;border:2px solid #000;border-radius:10px;text-align:center;font-size:18px;font-weight:bold;margin-bottom:10px}
+#box button{padding:10px 18px;background:red;color:#fff;border:none;border-radius:10px;font-weight:bold;margin:3px}
+#box .pilihan{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+#box .pilihan button{background:#222;font-size:20px;padding:10px}
+#pocong{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-size:90px;z-index:30;display:none;text-align:center}
+#btnPanah{position:absolute;right:15px;bottom:50px;width:70px;height:70px;border-radius:50%;background:#ff6600;border:3px solid #fff;color:#fff;font-size:30px;z-index:40;display:none}
 </style>
 </head>
 <body>
-<div id="hud"><h1>☠️ ESCAPE ROOM - HORROR ☠️</h1><p id="hudInfo">📍 LORONG GELAP | 🎎 0/4 | 👻 AMAN</p></div>
+<div id="hud"><h1>☠️ ESCAPE ROOM - FINAL, TANPA TIMER ☠️</h1><p>Mikir santai! Salah = Pocong! Gak ada timer!</p></div>
+<div id="game">
+<img id="bg" src="kamar.jpg">
 <div id="pesan"></div>
-<div id="game"><canvas id="c"></canvas></div>
-<div id="vignette"></div><div id="noise"></div>
-<div id="joy"><div id="knob"></div></div>
-<div id="aksi"><button id="btnMasuk">🚪</button><button class="kecil" onclick="putar()">🔄 PUTAR</button></div>
-<div id="jumpscare"><h1>👻</h1><h2 style="color:red;font-size:26px">DIA DI DEPANMU!</h2><p>Jangan lari... Dia lebih cepet...</p></div>
-<div id="awal"><div id="awalBox">
-<h2>☠️ SELAMAT DATANG DI RUMAH HANTU ☠️</h2>
-<p><b>🎯 MISI:</b> Masuk 4 kamar, ambil 4 boneka santet, kabur sebelum pocong nangkep lu.</p>
-<p><b>🕹️ JOYSTICK KIRI:</b> Geser buat jalan. Maju = ke depan, geser = ke samping.</p>
-<p><b>🚪 TOMBOL PINTU:</b> Kalo udah di depan pintu kayu, pencet buat masuk ke RUANGAN nya. Di dalem ada lemari, kasur, boneka nya!</p>
-<p><b>🔄 PUTAR:</b> Buat nengok kiri / kanan / belakang.</p>
-<p><b>⚠️ Kalo layar merah + geter = POCONG DEKET! Lari masuk kamar!</b></p>
-<button onclick="mulai()">🩸 MASUK RUMAH - JANGAN TAKUT 🩸</button>
-</div></div>
+<div id="pocong">👻<br><span style="background:red;color:#fff;font-size:13px;padding:4px 10px;border-radius:10px">POCONG! TEMBAK!</span></div>
+<div class="hot" id="hLemari">🗄️ LEMARI - 7391</div>
+<div class="hot" id="hCermin">🪞 CERMIN - KATA</div>
+<div class="hot" id="hPintu">🚪 PINTU - TANPA TIMER</div>
+<div class="hot" id="hKasur">🛏️ KASUR - 5 BONEKA</div>
+<div class="hot" id="hMeja">🕯️ MEJA - PANAH + PETUNJUK</div>
+<div class="hot" id="hJendela">🌙 JENDELA - HITUNG</div>
+<button id="btnPanah">🏹</button>
+<div id="invent">🎒 Kosong</div>
+</div>
+<div id="popup"><div id="box"><h2 id="pJudul"></h2><p id="pIsi"></p><div id="pExtra"></div><button onclick="tutup()">OKE</button></div></div>
 <script>
-let canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
-canvas.width=innerWidth; canvas.height=innerHeight; let W=canvas.width, H=canvas.height;
-let pz=0, px=0, rot=0, mulaiMain=false, found=0, pocongZ=-22, gameOver=false, diKamar=null, waktu=0;
-let joyVX=0, joyVZ=0, joyActive=false;
-let joy=document.getElementById('joy'), knob=document.getElementById('knob');
-function pesan(t){let e=document.getElementById('pesan'); e.innerText=t; e.style.display='block'; setTimeout(()=>e.style.display='none',2800);}
-function mulai(){document.getElementById('awal').style.display='none'; mulaiMain=true; pesan('Jalan pake joystick... Jangan berisik...');}
-function putar(){rot+=Math.PI/2; if(rot>=Math.PI*2) rot=0; pesan('Kamu nengok ke arah lain...');}
-joy.addEventListener('touchstart',e=>{joyActive=true; gerak(e)},{passive:false});
-joy.addEventListener('touchmove',e=>{if(joyActive) gerak(e); e.preventDefault()},{passive:false});
-joy.addEventListener('touchend',()=>{joyActive=false; joyVX=0; joyVZ=0; knob.style.left='42px'; knob.style.top='42px';});
-function gerak(e){let r=joy.getBoundingClientRect(); let t=e.touches[0]; let dx=t.clientX-(r.left+62), dy=t.clientY-(r.top+62); let j=Math.hypot(dx,dy)||1; if(j>42){dx=dx/j*42; dy=dy/j*42;} knob.style.left=(42+dx)+'px'; knob.style.top=(42+dy)+'px'; joyVX=dx/42; joyVZ=dy/42;}
-document.getElementById('btnMasuk').addEventListener('click',()=>{
-  if(diKamar){diKamar=null; pesan('Kamu keluar kamar... Balik ke lorong...'); return;}
-  if(Math.abs(pz+6)<1.2 || Math.abs(pz+14)<1.2){
-    diKamar = Math.abs(pz+6)<1.2 ? 1 : 2;
-    found++; pocongZ=pz-22; pesan('MASUK KAMAR '+diKamar+'! Kamu liat ruangan nya! Dapet boneka! Total: '+found+'/4');
-    if(found>=4){pesan('🎉 KAMU KABUR! TAPI POCONG MASIH NGIKUTIN...'); setTimeout(()=>location.reload(),2500);}
-  } else pesan('Gak ada pintu di sini! Jalan sampe deket pintu kayu di dinding!');
-});
-function gambarKamar(n){
-  // RUANGAN BENERAN - BUKAN KOTAK DOANG
-  ctx.fillStyle='#0a0a0a'; ctx.fillRect(0,0,W,H);
-  // Lantai kayu kamar
-  ctx.fillStyle='#2a1a00'; ctx.fillRect(0,H*0.6,W,H*0.4);
-  ctx.strokeStyle='#1a0f00'; for(let i=0;i<10;i++){ctx.beginPath(); ctx.moveTo(0,H*0.6+i*15); ctx.lineTo(W,H*0.6+i*15); ctx.stroke();}
-  // Dinding kamar
-  ctx.fillStyle='#1a1a1a'; ctx.fillRect(0,0,W,H*0.6);
-  // Jendela dengan bulan
-  ctx.fillStyle='#000033'; ctx.fillRect(W*0.7,H*0.1,120,100); ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(W*0.7+60,H*0.1+50,18,0,7); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font='12px Arial'; ctx.fillText('🌕 BULAN',W*0.7,H*0.25);
-  // Lemari gede
-  ctx.fillStyle='#3a1a00'; ctx.fillRect(W*0.08,H*0.15,110,250); ctx.fillStyle='#5a2a00'; ctx.fillRect(W*0.08+5,H*0.15+5,100,240);
-  ctx.fillStyle='gold'; ctx.font='bold 13px Arial'; ctx.fillText('LEMARI',W*0.08+15,H*0.15+120);
-  ctx.fillText('🔒',W*0.08+40,H*0.15+150);
-  // Kasur
-  ctx.fillStyle='#222'; ctx.fillRect(W*0.35,H*0.45,220,90); ctx.fillStyle='#fff'; ctx.fillRect(W*0.35+10,H*0.45+10,200,30);
-  ctx.fillStyle='#ff0000'; ctx.font='14px Arial'; ctx.fillText('🩸 KASUR BERDARAH',W*0.35+20,H*0.45+60);
-  // Meja + boneka
-  ctx.fillStyle='#333'; ctx.fillRect(W*0.65,H*0.5,120,80); ctx.font='50px Arial'; ctx.fillText('🎎',W*0.65+25,H*0.5+60);
-  ctx.fillStyle='yellow'; ctx.font='bold 13px Arial'; ctx.fillText('BONEKA NYA DI SINI!',W*0.6,H*0.45);
-  ctx.fillText('Pencet 🚪 lagi buat keluar',W*0.3,H*0.95);
-  // Darah di dinding
-  ctx.fillStyle='rgba(255,0,0,.7)'; ctx.font='16px Arial'; ctx.fillText('TOLONG...',W*0.45,H*0.2);
-  ctx.fillText('DIA ADA DI SINI...',W*0.42,H*0.28);
-}
-function gambar(){
-  waktu++;
-  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-  if(!mulaiMain){requestAnimationFrame(gambar); return;}
-  if(diKamar){gambarKamar(diKamar); requestAnimationFrame(gambar); return;}
-  // LORONG - GRAFIK BAGUS
-  // Langit-langit gelap + lampu kedip
-  let kedip = Math.random()<0.02 ? 0.3 : 1;
-  ctx.fillStyle=`rgba(20,20,20,${kedip})`; ctx.fillRect(0,0,W,H*0.32);
-  // Lampu gantung
-  ctx.fillStyle='#ffcc00'; ctx.beginPath(); ctx.arc(W/2, H*0.1, 12,0,7); ctx.fill();
-  ctx.fillStyle='rgba(255,200,0,0.15)'; ctx.beginPath(); ctx.arc(W/2,H*0.25,90,0,7); ctx.fill();
-  // Dinding kiri - bata
-  let gradKiri=ctx.createLinearGradient(0,0,W*0.3,0); gradKiri.addColorStop(0,'#000'); gradKiri.addColorStop(1,'#2a1a1a'); ctx.fillStyle=gradKiri; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(W*0.35,H*0.45); ctx.lineTo(W*0.35,H*0.65); ctx.lineTo(0,H); ctx.fill();
-  // Dinding kanan
-  let gradKanan=ctx.createLinearGradient(W,0,W*0.7,0); gradKanan.addColorStop(0,'#000'); gradKanan.addColorStop(1,'#2a1a1a'); ctx.fillStyle=gradKanan; ctx.beginPath(); ctx.moveTo(W,0); ctx.lineTo(W*0.65,H*0.45); ctx.lineTo(W*0.65,H*0.65); ctx.lineTo(W,H); ctx.fill();
-  // Bata-bata kecil di dinding
-  ctx.strokeStyle='rgba(255,255,255,0.08)'; for(let y=0;y<10;y++){for(let x=0;x<5;x++){ctx.strokeRect(x*40, y*40, 40, 20);}}
-  // Lantai kayu lorong - perspektif
-  ctx.fillStyle='#1a0f00'; ctx.fillRect(0,H*0.65,W,H*0.35);
-  ctx.strokeStyle='#2a1a00'; ctx.lineWidth=2;
-  for(let i=-6;i<=6;i++){ctx.beginPath(); ctx.moveTo(W/2+i*25,H*0.55); ctx.lineTo(W/2+i*140,H); ctx.stroke();}
-  for(let d=0;d<8;d++){let y=H*0.6+d*20; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();}
-  // Darah di lantai
-  ctx.fillStyle='rgba(150,0,0,.6)'; ctx.beginPath(); ctx.ellipse(W*0.6,H*0.8,60,12,0,0,7); ctx.fill();
-  // Pintu kayu 1 - kiri - ada gagang, nomor, cahaya bawah pintu
-  let p1Y=H*0.48 - Math.abs(pz+6)*4; if(p1Y>0 && p1Y<H){
-    ctx.fillStyle='#3a1a00'; ctx.fillRect(W*0.06,p1Y,85,130);
-    ctx.fillStyle='#5a2200'; ctx.fillRect(W*0.06+4,p1Y+4,77,122);
-    ctx.fillStyle='#8a4a00'; for(let i=0;i<4;i++) ctx.fillRect(W*0.06+10,p1Y+10+i*28,65,20);
-    ctx.fillStyle='gold'; ctx.beginPath(); ctx.arc(W*0.06+65,p1Y+70,6,0,7); ctx.fill();
-    ctx.fillStyle='#fff'; ctx.font='bold 14px Arial'; ctx.fillText('1',W*0.06+35,p1Y+20);
-    ctx.fillStyle='rgba(255,200,0,.5)'; ctx.fillRect(W*0.06,p1Y+130,85,4);
-    ctx.fillStyle='yellow'; ctx.font='bold 11px Arial'; ctx.fillText('KAMAR 1 - LEMARI',W*0.02,p1Y-8);
-  }
-  // Pintu kayu 2 - kanan
-  let p2Y=H*0.48 - Math.abs(pz+14)*4; if(p2Y>0 && p2Y<H){
-    ctx.fillStyle='#3a1a00'; ctx.fillRect(W*0.80,p2Y,85,130);
-    ctx.fillStyle='#5a2200'; ctx.fillRect(W*0.80+4,p2Y+4,77,122);
-    ctx.fillStyle='#8a4a00'; for(let i=0;i<4;i++) ctx.fillRect(W*0.80+10,p2Y+10+i*28,65,20);
-    ctx.fillStyle='gold'; ctx.beginPath(); ctx.arc(W*0.80+20,p2Y+70,6,0,7); ctx.fill();
-    ctx.fillStyle='#fff'; ctx.font='bold 14px Arial'; ctx.fillText('2',W*0.80+35,p2Y+20);
-    ctx.fillStyle='rgba(255,200,0,.5)'; ctx.fillRect(W*0.80,p2Y+130,85,4);
-    ctx.fillStyle='yellow'; ctx.font='bold 11px Arial'; ctx.fillText('KAMAR 2 - DAPUR',W*0.76,p2Y-8);
-  }
-  // Tembok arahan di awal - nempel di dinding, kecil, gak nutupin
-  if(pz>-1){
-    ctx.fillStyle='#fff'; ctx.fillRect(W*0.28,H*0.12,W*0.44,75);
-    ctx.fillStyle='#000'; ctx.font='bold 13px Arial'; ctx.fillText('➡️ JALAN KE DEPAN',W*0.32,H*0.12+25);
-    ctx.fillText('Joystick kiri buat jalan!',W*0.32,H*0.12+48);
-    ctx.fillText('Pintu kayu di dinding!',W*0.32,H*0.12+65);
-  }
-  // POCONG - bukan emoji senyum lagi, tapi bayangan putih + muka serem
-  let jarakPocong=Math.abs(pocongZ-pz);
-  if(jarakPocong<20){
-    let skala=1-jarakPocong/20; let uk=50+skala*180; let pxPocong=W/2 - uk/2 + Math.sin(waktu*0.05)*10; let pyPocong=H*0.5 - uk*0.4;
-    // Bayangan pocong
-    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.moveTo(pxPocong,pyPocong+uk); ctx.lineTo(pxPocong+uk*0.2,pyPocong); ctx.lineTo(pxPocong+uk*0.8,pyPocong); ctx.lineTo(pxPocong+uk,pyPocong+uk); ctx.fill();
-    // Muka serem - mata hitam, mulut hitam
-    ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(pxPocong+uk*0.35,pyPocong+uk*0.3,uk*0.08,0,7); ctx.fill();
-    ctx.beginPath(); ctx.arc(pxPocong+uk*0.65,pyPocong+uk*0.3,uk*0.08,0,7); ctx.fill();
-    ctx.fillRect(pxPocong+uk*0.42,pyPocong+uk*0.6,uk*0.16,uk*0.12);
-    // Darah di pocong
-    ctx.fillStyle='red'; ctx.fillRect(pxPocong+uk*0.4,pyPocong+uk*0.2,uk*0.2,4);
-    if(jarakPocong<5){ctx.fillStyle='rgba(255,0,0,.25)'; ctx.fillRect(0,0,W,H); if(navigator.vibrate) navigator.vibrate(80);}
-    if(jarakPocong<1.2 && !gameOver){gameOver=true; document.getElementById('jumpscare').style.display='flex'; setTimeout(()=>{document.getElementById('jumpscare').style.display='none'; pesan('KETANGKEP! Lari masuk kamar!'); gameOver=false; pocongZ=pz-22;},1400);}
-  }
-  // Kabut
-  ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fillRect(0,H*0.5+Math.sin(waktu*0.02)*10,W,40);
-  // Senter - lingkaran terang di tengah
-  let grad=ctx.createRadialGradient(W/2,H/2,50,W/2,H/2,350); grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,.85)'); ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
-  document.getElementById('hudInfo').innerText=`📍 ${diKamar?'DI DALEM KAMAR '+diKamar:'LORONG GELAP'} | 🎎 ${found}/4 | 👻 ${jarakPocong<5?'DI DEPANMU! LARI!':jarakPocong<12?'MENDEKAT!':'JAUH'} | 📏 ${Math.round(-pz)}m`;
-  requestAnimationFrame(gambar);
-}
-setInterval(()=>{if(!mulaiMain || gameOver || diKamar) return; pz += -joyVZ*0.18; px += joyVX*0.1; pocongZ += 0.06; if(pocongZ>pz+2) pocongZ=pz-22;},30);
-gambar();
+let kunci=false,kode=false,boneka=false,panah=false,anakPanah=0,pintuStep=0,jendela=false,cermin=false,sudah={kunci:0,kode:0,boneka:0,panah:0},lock=false,pocongHidup=false,menang=false,cdPanah=false;
+let pesanEl=document.getElementById('pesan'),invent=document.getElementById('invent'),pocongEl=document.getElementById('pocong'),btnPanah=document.getElementById('btnPanah');
+function tampil(t){pesanEl.innerText=t;pesanEl.style.display='block';setTimeout(()=>pesanEl.style.display='none',2800);}
+function popup(j,i,ex){document.getElementById('pJudul').innerText=j;document.getElementById('pIsi').innerText=i;document.getElementById('pExtra').innerHTML=ex||'';document.getElementById('popup').style.display='flex';}
+function tutup(){document.getElementById('popup').style.display='none';}
+function spam(){if(lock)return true;lock=true;setTimeout(()=>lock=false,800);return false;}
+function update(){invent.innerText=`🎒 ${kunci?'🔑Kunci ':''}${kode?'🔢Kode 3713 ':''}${boneka?'🎎Boneka ':''}${panah?'🏹Panah ':''}🏹 ${anakPanah} | Pintu ${pintuStep}/3`;}
+function pocong(alasan){if(pocongHidup||menang)return;pocongHidup=true;pocongEl.style.display='block';btnPanah.style.display='block';tampil('💀 POCONG! '+alasan+' Tembak!');setTimeout(()=>{if(pocongHidup){pocongHidup=false;pocongEl.style.display='none';btnPanah.style.display='none';pintuStep=0;tampil('💀 DITANGKEP! Pintu ngulang dari awal!');}},8000);}
+btnPanah.onclick=()=>{if(!pocongHidup||cdPanah)return;if(!panah){tampil('⛔ Belum punya PANAH! Cek KASUR!');return;}if(anakPanah<=0){tampil('⛔ ANAK PANAH HABIS! Cek MEJA!');return;}cdPanah=true;anakPanah--;tampil('🏹 DOR! Kena! Sisa '+anakPanah);setTimeout(()=>{pocongHidup=false;pocongEl.style.display='none';btnPanah.style.display='none';tampil('🎉 Pocong kabur!');},800);setTimeout(()=>cdPanah=false,2000);update();};
+// 1. JENDELA - HITUNG, GAK NGASIH KODE LANGSUNG
+document.getElementById('hJendela').onclick=()=>{if(spam())return;if(!jendela){jendela=true;popup('🌙 JENDELA','Lihat luar: Bulan ada 3, Bintang ada 2, Lilin di meja ada 1. Rumus: (Bulan x Bintang) + Lilin = Angka pertama. Angka lengkapnya? Cek di bawah kasur? Bukan. Cek di MEJA, ada kertas petunjuk!');}else popup('🌙 JENDELA','Bulan 3, Bintang 2, Lilin 1. (3x2)+1 = 7. Angka pertama 7!');update();};
+// MEJA - CUMA PETUNJUK, GAK BOCORIN KODE
+document.getElementById('hMeja').onclick=()=>{if(spam())return;if(anakPanah>=5){tampil('⛔ Anak panah max 5!');return;}anakPanah=5;popup('🕯️ MEJA','Dapet 5 ANAK PANAH! + Kertas petunjuk: Kode lemari itu 4 angka. Angka pertama dari JENDELA. 3 angka belakangnya dari jumlah paku di pintu lemari: 391. Gabungin sendiri!');update();};
+// LEMARI
+document.getElementById('hLemari').onclick=()=>{if(spam())return;if(sudah.kunci){tampil('⛔ ANTI DUPE! Kunci udah diambil!');return;}if(!jendela){popup('🗄️ TERKUNCI','Cek JENDELA + MEJA dulu!');return;}popup('🗄️ GEMBOK 4 ANGKA','Angka pertama dari JENDELA, 3 angka belakang dari MEJA. Jadi?','<input id="inL" placeholder="????"><br><button onclick="cekL()">BUKA</button>');};
+function cekL(){let v=document.getElementById('inL').value;if(v=='7391'){sudah.kunci=1;kunci=true;document.getElementById('hLemari').classList.add('done');tutup();popup('🎉 BENER!','7391! Dapet KUNCI!');}else{tutup();pocong('Kode lemari salah!');}update();}
+// CERMIN
+document.getElementById('hCermin').onclick=()=>{if(spam())return;if(sudah.kode){tampil('⛔ ANTI DUPE! Kode udah didapet!');return;}if(!cermin){cermin=true;popup('🪞 CERMIN','Gosok cermin... Muncul kata: TIGA-TUJUH-SATU-TIGA. Ubah kata jadi angka! TIGA=3, TUJUH=7, SATU=1. Jadi kode pintu berapa?','<input id="inC" placeholder="Kata jadi angka"><br><button onclick="cekC()">JAWAB</button>');}else{popup('🪞 CERMIN','Kata nya: TIGA-TUJUH-SATU-TIGA. Jadi angka?','<input id="inC" placeholder="????"><br><button onclick="cekC()">JAWAB</button>');}update();};
+function cekC(){let v=document.getElementById('inC').value;if(v=='3713'){sudah.kode=1;kode=true;document.getElementById('hCermin').classList.add('done');tutup();popup('🎉 BENER!','TIGA(3)-TUJUH(7)-SATU(1)-TIGA(3) = 3713! Itu kode pintu!');}else{tutup();pocong('Kode cermin salah!');}update();}
+// KASUR
+document.getElementById('hKasur').onclick=()=>{if(spam())return;if(panah&&boneka){tampil('⛔ Udah diambil semua!');return;}popup('🛏️ KASUR','Panah di bawah kasur. Boneka ada 5. Tebak-tebakan: Aku tidak punya mata, tapi aku melihatmu. Aku tidak punya mulut, tapi aku memanggilmu. Aku yang paling kecil, tapi aku yang paling asli. Yang mana?','<button onclick="ambilP()">🏹 AMBIL PANAH</button><br><div class="pilihan"><button onclick="cekB(1)">🎎 Paling Gede</button><button onclick="cekB(2)">🎎 Mata Merah</button><button onclick="cekB(3)">🎎 Paling Kecil</button><button onclick="cekB(4)">🎎 Mata Biru</button><button onclick="cekB(5)">🎎 Paling Jelek</button></div>');};
+function ambilP(){if(sudah.panah){tutup();tampil('⛔ Panah udah diambil!');return;}sudah.panah=1;panah=true;tutup();popup('🏹 DAPET PANAH!','Buat tembak pocong!');update();}
+function cekB(p){if(p==3){sudah.boneka=1;boneka=true;document.getElementById('hKasur').classList.add('done');tutup();popup('🎉 BENER!','Yang paling kecil itu yang asli!');}else{tutup();pocong('Salah pilih boneka!');}update();}
+// PINTU - TANPA TIMER, SANTAI!
+document.getElementById('hPintu').onclick=()=>{
+  if(spam())return;if(menang){tampil('⛔ Udah menang!');return;}
+  if(pintuStep==0){if(!kunci){popup('🚪 PINTU','Butuh KUNCI! Buka LEMARI!');return;}pintuStep=1;popup('🚪 LANGKAH 1 OK! TANPA TIMER, SANTAI!','Masukin kode pintu! Kode dari CERMIN: TIGA-TUJUH-SATU-TIGA. Mikir santai, gak ada timer!','<input id="inP" placeholder="????"><br><button onclick="cekP()">MASUKIN</button>');}
+  else if(pintuStep==1){popup('🚪 KODE PINTU','Santai, gak ada timer!','<input id="inP" placeholder="????"><br><button onclick="cekP()">MASUKIN</button>');}
+  else if(pintuStep==2){if(!boneka){popup('🚪 PINTU','Butuh BONEKA ASLI! Yang paling kecil!');return;}popup('🚪 TERAKHIR!','Taro boneka?','<button onclick="menangG()">TARO + KABUR!</button>');}
+};
+function cekP(){let v=document.getElementById('inP').value;if(v=='3713'){pintuStep=2;tutup();popup('🎉 KODE BENER!','Sekarang taro boneka!');}else{pintuStep=0;tutup();pocong('Kode pintu salah!');}update();}
+function menangG(){menang=true;tutup();popup('🎉 MENANG! SEMPURNA! TANPA TIMER!','Lu berhasil! Kode lemari 7391 + Kode pintu 3713 + Boneka paling kecil! Urutan bener! Tanpa timer, santai tapi tetep susah!');document.getElementById('hPintu').classList.add('done');update();}
+update();tampil('FINAL! Tanpa timer! Mulai: JENDELA -> MEJA -> LEMARI -> CERMIN -> KASUR -> PINTU!');
 </script>
 </body>
 </html>
