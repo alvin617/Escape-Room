@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ESCAPE ROOM PRO - DI LOBBY</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:#000;color:#fff;overflow:hidden}
+#game{width:100vw;height:100vh;position:relative;background:#111;overflow:hidden}
+.room{display:none;width:100%;height:100%;position:absolute;top:0;left:0;padding:15px}
+.room.active{display:block}
+#room1{background:linear-gradient(#1a0f0f,#2b1a1a)}
+#room2{background:linear-gradient(#0f1a0f,#1a2b1a)}
+#room3{background:linear-gradient(#0f0f1a,#1a1a2b)}
+#room4{background:linear-gradient(#000,#1a0f00)}
+#hiddenRoom{background:linear-gradient(#200,#400)}
+#lobby{background:linear-gradient(#111,#222)}
+.top{display:flex;justify-content:space-between;background:rgba(0,0,0,.7);padding:8px 10px;border-radius:10px;font-size:13px;font-weight:bold}
+.top span{color:#ffcc00}
+#player{position:absolute;width:48px;height:48px;background:#00ff88;border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:10;box-shadow:0 0 15px #00ff88;transition:all .15s}
+#pocong{position:absolute;width:52px;height:52px;background:#fff;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:32px;z-index:9;transition:all .5s;border:3px solid #000}
+#pocong.sleep{filter:grayscale(1);opacity:.6}
+#pocong.sleep::after{content:"💤";position:absolute;top:-18px;right:-5px;font-size:20px}
+.obj{position:absolute;background:rgba(255,255,255,.15);border:2px dashed #ffcc00;border-radius:10px;padding:10px;text-align:center;cursor:pointer;font-size:12px;min-width:90px}
+.obj b{display:block;font-size:18px}
+#joystick{position:absolute;left:15px;bottom:20px;width:120px;height:120px;background:rgba(255,255,255,.15);border-radius:50%;border:2px solid #fff;z-index:50}
+#stick{position:absolute;left:35px;top:35px;width:50px;height:50px;background:#fff;border-radius:50%}
+#btns{position:absolute;right:15px;bottom:20px;display:flex;gap:8px;z-index:50;flex-wrap:wrap;justify-content:flex-end;max-width:200px}
+.btn{width:62px;height:62px;border-radius:50%;border:3px solid #fff;font-size:24px;background:#ff2222;color:#fff;font-weight:bold}
+.btn.blue{background:#2222ff}.btn.green{background:#00aa00}.btn.yellow{background:#ffaa00;color:#000}
+#dialog{position:absolute;left:10px;right:10px;bottom:160px;background:rgba(0,0,0,.92);border:2px solid #ffcc00;border-radius:12px;padding:14px;display:none;z-index:100}
+#dialog h3{color:#ffcc00;margin-bottom:6px}
+#dialog p{font-size:14px;line-height:1.5;margin-bottom:10px}
+#dialog input{width:100%;padding:10px;border-radius:8px;border:none;font-size:16px;text-transform:uppercase}
+#dialog button{margin-top:10px;padding:10px 16px;border:none;border-radius:8px;background:#ffcc00;font-weight:bold;width:100%;font-size:15px}
+#aimLine{position:absolute;height:3px;background:#ffcc00;display:none;z-index:5;transform-origin:left center}
+.badge{background:#ff2222;padding:2px 7px;border-radius:20px;color:#fff}
+</style>
+</head>
+<body>
+<div id="game">
+  <!-- LOBBY -->
+  <div id="lobby" class="room active">
+    <div class="top"><span>🏨 LOBBY</span><span>👻 POCONG: <span id="pocongDist">JAUH</span></span><span>🎎 <span id="dollCount">0</span>/4 | 🧩 <span id="puzzleCount">0</span>/4</span></div>
+    <h2 style="margin:12px 0 4px">ESCAPE ROOM - DI LOBBY</h2>
+    <p style="font-size:13px;opacity:.8">Cari 4 boneka + jawab 4 teka-teki = dapet kunci. Jangan sampe ketangkep!</p>
+    <div class="obj" style="left:20px;top:140px" onclick="goRoom(1)"><b>🛏️</b>KAMAR 1<br>Lemari + Cermin</div>
+    <div class="obj" style="left:200px;top:140px" onclick="goRoom(2)"><b>🍳</b>KAMAR 2<br>Dapur</div>
+    <div class="obj" style="left:20px;top:280px" onclick="goRoom(3)"><b>🛋️</b>KAMAR 3<br>Ruang Tamu</div>
+    <div class="obj" style="left:200px;top:280px" onclick="goRoom(4)"><b>🪦</b>KAMAR 4<br>Bawah Tanah</div>
+    <div class="obj" id="hiddenDoor" style="left:110px;top:410px;background:#330;display:none" onclick="goRoom(5)"><b>🚪</b>RUANG TERSEMBUNYI<br>Butuh KUNCI</div>
+    <div id="player" style="left:150px;top:550px">🏃</div>
+    <div id="pocong" style="left:280px;top:550px">🧟</div>
+    <div id="aimLine"></div>
+  </div>
+
+  <!-- KAMAR 1 -->
+  <div id="room1" class="room">
+    <div class="top"><span>🛏️ KAMAR 1</span><button onclick="goRoom(0)" style="padding:4px 10px;border-radius:8px">⬅ LOBBY</button></div>
+    <h3 style="margin:10px 0">Lemari Goyang + Cermin Retak</h3>
+    <div class="obj" style="left:30px;top:120px" onclick="openPuzzle(1)"><b>🗄️</b>LEMBARI<br>🔍 PERIKSA</div>
+    <div class="obj" style="left:180px;top:120px" onclick="takeDoll(1)"><b>🎎</b>BONEKA 1<br>Di Lemari</div>
+    <div class="obj" style="left:30px;top:260px" onclick="showHint('Lihat cermin retak, bayangan kamu ada 2!')"><b>💡</b>HINT</div>
+  </div>
+  <!-- KAMAR 2 -->
+  <div id="room2" class="room">
+    <div class="top"><span>🍳 KAMAR 2 - DAPUR</span><button onclick="goRoom(0)" style="padding:4px 10px;border-radius:8px">⬅ LOBBY</button></div>
+    <h3 style="margin:10px 0">Panci Ditutup + Kompor Mati</h3>
+    <div class="obj" style="left:30px;top:120px" onclick="openPuzzle(2)"><b>🍲</b>PANCI<br>🔍 PERIKSA</div>
+    <div class="obj" style="left:180px;top:120px" onclick="takeDoll(2)"><b>🎎</b>BONEKA 2<br>Di Panci</div>
+    <div class="obj" style="left:30px;top:260px" onclick="takeItem('palu')"><b>🔨</b>PALU<br>Di Dapur</div>
+    <div class="obj" style="left:180px;top:260px" onclick="showHint('Yang padam itu masih ada wujudnya!')"><b>💡</b>HINT</div>
+  </div>
+  <!-- KAMAR 3 -->
+  <div id="room3" class="room">
+    <div class="top"><span>🛋️ KAMAR 3 - RUANG TAMU</span><button onclick="goRoom(0)" style="padding:4px 10px;border-radius:8px">⬅ LOBBY</button></div>
+    <h3 style="margin:10px 0">Foto Jatoh + Sofa Robek</h3>
+    <div class="obj" style="left:30px;top:120px" onclick="openPuzzle(3)"><b>🖼️</b>FOTO KELUARGA<br>🔍 PERIKSA</div>
+    <div class="obj" style="left:180px;top:120px" onclick="takeDoll(3)"><b>🎎</b>BONEKA 3<br>Bawah Sofa</div>
+    <div class="obj" style="left:30px;top:260px" onclick="showHint('Jam 6:00 itu udah pagi, Pocong udah ilang!')"><b>💡</b>HINT</div>
+  </div>
+  <!-- KAMAR 4 -->
+  <div id="room4" class="room">
+    <div class="top"><span>🪦 KAMAR 4 - BAWAH TANAH</span><button onclick="goRoom(0)" style="padding:4px 10px;border-radius:8px">⬅ LOBBY</button></div>
+    <h3 style="margin:10px 0">Gali Tanah Pake SEKOP!</h3>
+    <div class="obj" style="left:20px;top:110px" onclick="takeItem('sekop')"><b>🪣</b>SEKOP<br>Di Samping Tanah</div>
+    <div class="obj" style="left:180px;top:110px" onclick="dig()"><b>⛏️</b>TANAH<br>Gali: <span id="digCount">0</span>/5</div>
+    <div class="obj" id="coffinObj" style="left:30px;top:230px;display:none" onclick="openPuzzle(4)"><b>⚰️</b>PETI MATI<br>🔍 PERIKSA</div>
+    <div class="obj" style="left:180px;top:230px" onclick="takeDoll(4)"><b>🎎</b>BONEKA 4<br>Di Peti</div>
+    <div class="obj" id="medBox" style="left:30px;top:340px" onclick="openMedBox()"><b>📦</b>KOTAK MEDIS<br>Kekunci! Butuh PALU</div>
+    <div class="obj" style="left:180px;top:340px" onclick="showHint('Diri sendiri itu cuma bayangan, kalo berani dia ilang!')"><b>💡</b>HINT</div>
+  </div>
+  <!-- RUANG TERSEMBUNYI -->
+  <div id="hiddenRoom" class="room">
+    <div class="top"><span>🚪 RUANG TERSEMBUNYI</span><button onclick="goRoom(0)" style="padding:4px 10px;border-radius:8px">⬅ LOBBY</button></div>
+    <h3 style="margin:10px 0">Cek Saku Jaket!</h3>
+    <div class="obj" style="left:30px;top:130px" onclick="takeItem('korek')"><b>🧥</b>JAKET TUA<br>Cek SAKU! 🔍</div>
+    <div class="obj" style="left:180px;top:130px" onclick="burnAndEscape()"><b>🔥</b>BAKAR BONEKA<br>+ BUKA PINTU</div>
+    <p id="inv" style="margin-top:220px;background:#000;padding:10px;border-radius:10px;font-size:13px">TAS: -</p>
+  </div>
+
+  <div id="joystick"><div id="stick"></div></div>
+  <div id="btns">
+    <button class="btn green" onclick="actionBtn()">🅰️</button>
+    <button class="btn blue" onclick="shoot()">🏹 <span id="arrowCount">0</span></button>
+    <button class="btn yellow" onclick="hidePlayer()">🙈</button>
+    <button class="btn" onclick="showHint('Cek tempat yang goyang / bunyi / jatoh!')">💡</button>
+  </div>
+
+  <div id="dialog">
+    <h3 id="dTitle">Teka-teki</h3>
+    <p id="dText"></p>
+    <input id="dInput" placeholder="Ketik jawaban...">
+    <button onclick="checkAnswer()">JAWAB</button>
+    <button onclick="closeDialog()" style="background:#555;color:#fff">TUTUP</button>
+  </div>
+</div>
+
+<script>
+let px=150, py=550, pocongX=280, pocongY=550, pocongSleepUntil=0, pocongSpeed=1;
+let dolls=new Set(), puzzles=new Set(), inv={palu:false,sekop:false,korek:false,kunci:false}, arrows=0, digs=0, currentPuzzle=0, wrongCount=0, isHidden=false, gameOver=false;
+let aimDir={x:1,y:0};
+
+function updateHUD(){
+  document.getElementById('dollCount').textContent=dolls.size;
+  document.getElementById('puzzleCount').textContent=puzzles.size;
+  document.getElementById('arrowCount').textContent=arrows;
+  document.getElementById('digCount').textContent=digs;
+  let tas=[]; if(inv.palu)tas.push('🔨 Palu'); if(inv.sekop)tas.push('🪣 Sekop'); if(inv.korek)tas.push('🔥 Korek'); if(inv.kunci)tas.push('🔑 Kunci'); if(arrows)tas.push('🏹 Panah x'+arrows);
+  document.getElementById('inv').textContent='TAS: '+(tas.join(' | ')||'-');
+  if(dolls.size===4 && puzzles.size===4 && !inv.kunci){ inv.kunci=true; alert('🎉 4 Boneka + 4 Teka-teki! Dapet KUNCI 🔑! Ruang Tersembunyi kebuka!'); document.getElementById('hiddenDoor').style.display='block'; }
+  if(puzzles.size===4 && dolls.size<4) alert('Teka-teki beres! Tinggal cari boneka yang kurang!');
+}
+function goRoom(n){
+  if(gameOver) return;
+  document.querySelectorAll('.room').forEach(r=>r.classList.remove('active'));
+  let map={0:'lobby',1:'room1',2:'room2',3:'room3',4:'room4',5:'hiddenRoom'};
+  if(n===5 && !inv.kunci){ alert('Butuh KUNCI! Selesaikan 4 boneka + 4 teka-teki dulu!'); document.getElementById('lobby').classList.add('active'); return; }
+  document.getElementById(map[n]).classList.add('active');
+  // Pindah player + pocong cuma di lobby
+  let p=document.getElementById('player'), pc=document.getElementById('pocong');
+  if(n===0){ p.style.display='flex'; pc.style.display='flex'; } else { p.style.display='none'; pc.style.display='none'; }
+}
+const PUZZLES={
+1:{q:'Aku tidak punya mulut, tapi aku selalu berteriak di malam hari. Aku tidak punya kaki, tapi aku selalu mengejarmu. Setiap kamu melihatku, kamu melihat dirimu yang sudah mati. Siapa aku?',a:['BAYANGAN','CERMIN']},
+2:{q:'Pocong punya 3 lilin. 1 lilin padam karena angin. 1 lilin padam karena dia tiup. Berapa lilin yang tersisa?',a:['3','TIGA']},
+3:{q:'Jam 3:33 Pocong ketuk pintu 3x. Jam 4:44 ketuk 4x. Jam 5:55 ketuk 5x. Jam 6:00 ketuk berapa kali?',a:['0','TIDAK MENGETUK','NOL','TIDAK','GAK MENGETUK']},
+4:{q:'Ada 4 pintu. Pintu 1 ada api. Pintu 2 ada Pocong. Pintu 3 ada jurang. Pintu 4 ada cermin yang kalo lu masuk, lu bakal ketemu diri lu sendiri yang udah jadi Pocong. Pintu mana yang paling aman?',a:['PINTU 4','4','CERMIN','PINTU 4 - CERMIN']}
+};
+function openPuzzle(n){
+  if(puzzles.has(n)){ alert('Udah kejawab!'); return; }
+  if(n===4 && digs<5){ alert('Gali dulu pake SEKOP! Tekan TANAH 5x!'); return; }
+  currentPuzzle=n; document.getElementById('dTitle').textContent='TEKA-TEKI KAMAR '+n;
+  document.getElementById('dText').textContent=PUZZLES[n].q;
+  document.getElementById('dInput').value=''; document.getElementById('dialog').style.display='block';
+}
+function checkAnswer(){
+  let v=document.getElementById('dInput').value.trim().toUpperCase();
+  let ok=PUZZLES[currentPuzzle].a.some(a=>v.includes(a));
+  if(ok){ puzzles.add(currentPuzzle); alert('✅ BENAR! Pocong mundur!'); pocongX=Math.min(320,pocongX+40); updateHUD(); closeDialog(); }
+  else{ wrongCount++; alert('❌ SALAH! Pocong maju! ('+wrongCount+'x salah)'); pocongX=Math.max(20,pocongX-50); if(wrongCount>=2){ alert('⚠️ 2x Salah! Pocong lari cepet 10 detik!'); pocongSpeed=3; setTimeout(()=>pocongSpeed=1,10000); wrongCount=0; } closeDialog(); }
+}
+function closeDialog(){ document.getElementById('dialog').style.display='none'; }
+function showHint(t){ alert('💡 HINT: '+t); }
+function takeDoll(n){ if(dolls.has(n)){alert('Udah diambil!');return;} dolls.add(n); alert('🎎 Dapet BONEKA '+n+'! Pocong mundur 2 langkah!'); pocongX=Math.min(320,pocongX+40); updateHUD(); }
+function takeItem(it){
+  if(it==='palu' && !inv.palu){ inv.palu=true; alert('🔨 Dapet PALU di Dapur! Buat mecahin Kotak Medis!'); }
+  else if(it==='sekop' && !inv.sekop){ inv.sekop=true; alert('🪣 Dapet SEKOP di samping tanah! Buat gali!'); }
+  else if(it==='korek' && !inv.korek){ inv.korek=true; alert('🔥 Dapet KOREK di SAKU JAKET! Bakar boneka sekarang!'); }
+  else alert('Udah punya!');
+  updateHUD();
+}
+function dig(){
+  if(!inv.sekop){ alert('Ambil SEKOP dulu yang di samping tanah!'); return; }
+  if(digs>=5){ alert('Udah kegali! Buka PETI MATI!'); return; }
+  digs++; alert('⛏️ Gali... '+digs+'/5'); if(digs>=5){ document.getElementById('coffinObj').style.display='block'; alert('⚰️ Keliatan PETI MATI KECIL! Buka!'); }
+  updateHUD();
+}
+function openMedBox(){
+  if(arrows>0){ alert('Udah kebuka!'); return; }
+  if(!inv.palu){ alert('📦 Kotak kekunci! Butuh PALU dari Dapur!'); return; }
+  arrows=3; alert('💥 BRAK! Kotak kebuka pake PALU! Dapet 3 PANAH 🏹!'); updateHUD();
+}
+function shoot(){
+  if(arrows<=0){ alert('Gak punya panah! Buka Kotak Medis pake Palu dulu!'); return; }
+  if(Date.now()<pocongSleepUntil){ alert('Pocong masih tidur! Tunggu bangun dulu!'); return; }
+  arrows--; updateHUD();
+  // Kena kalo deket
+  let dist=Math.abs(px-pocongX);
+  if(dist<180){ pocongSleepUntil=Date.now()+60000; document.getElementById('pocong').classList.add('sleep'); alert('🏹 KENA! Pocong TIDUR 1 MENIT! Cepet kabur!'); setTimeout(()=>{ document.getElementById('pocong').classList.remove('sleep'); alert('👻 Pocong BANGUN lagi!'); },60000); }
+  else alert('🏹 Meleset! Pocong kejauhan! Deketin dulu!');
+}
+function hidePlayer(){ isHidden=!isHidden; alert(isHidden?'🙈 Kamu sembunyi! Pocong bingung!':'👀 Kamu keluar dari persembunyian!'); }
+function actionBtn(){ alert('Tekan objek yang ada tulisan 🔍 PERIKSA / ambil!'); }
+function burnAndEscape(){
+  if(!inv.korek){ alert('Butuh KOREK di SAKU JAKET dulu!'); return; }
+  if(!inv.kunci){ alert('Butuh KUNCI!'); return; }
+  gameOver=true; alert('🔥 BAKAR BONEKA... 💥 PINTU KEBUKA... 🏃 LARI... 🌞 MATAHARI TERBIT... 🎉 LU BEBAS!');
+  document.body.innerHTML='<div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ffcc00;color:#000;text-align:center;padding:20px"><h1>🎉 LU BEBAS! 🎉</h1><p style="margin:10px 0">Pocong kebakar. Rumah meledak. Matahari terbit.</p><h2>ESCAPE ROOM PRO - TAMAT</h2><button onclick="location.reload()" style="margin-top:15px;padding:12px 20px;border:none;border-radius:10px;background:#000;color:#fff;font-weight:bold">MAIN LAGI</button></div>';
+}
+// Joystick
+let joy=document.getElementById('joystick'), stick=document.getElementById('stick'), joyActive=false;
+joy.addEventListener('touchstart',e=>{joyActive=true; moveJoy(e)}, {passive:false});
+joy.addEventListener('touchmove',e=>{ if(joyActive) moveJoy(e); e.preventDefault(); }, {passive:false});
+joy.addEventListener('touchend',()=>{joyActive=false; stick.style.left='35px'; stick.style.top='35px';});
+joy.addEventListener('mousedown',e=>{joyActive=true; moveJoy(e)});
+document.addEventListener('mousemove',e=>{ if(joyActive) moveJoy(e); });
+document.addEventListener('mouseup',()=>{joyActive=false; stick.style.left='35px'; stick.style.top='35px';});
+function moveJoy(e){
+  let r=joy.getBoundingClientRect(); let cx=r.left+r.width/2, cy=r.top+r.height/2;
+  let x=(e.touches?e.touches[0].clientX:e.clientX)-cx, y=(e.touches?e.touches[0].clientY:e.clientY)-cy;
+  let len=Math.sqrt(x*x+y*y)||1; let nx=x/len, ny=y/len;
+  stick.style.left=(35+nx*20)+'px'; stick.style.top=(35+ny*20)+'px';
+  aimDir={x:nx,y:ny}; px=Math.max(10,Math.min(320,px+nx*10)); py=Math.max(400,Math.min(620,py+ny*10));
+  let p=document.getElementById('player'); p.style.left=px+'px'; p.style.top=py+'px';
+  // Aim line
+  let line=document.getElementById('aimLine'); line.style.display='block'; line.style.left=(px+24)+'px'; line.style.top=(py+24)+'px'; line.style.width='80px'; line.style.transform='rotate('+Math.atan2(ny,nx)+'rad)';
+}
+// Pocong ngejar
+setInterval(()=>{
+  if(gameOver || Date.now()<pocongSleepUntil || isHidden) return;
+  if(document.getElementById('lobby').classList.contains('active')){
+    if(pocongX>px) pocongX-=pocongSpeed*2; else pocongX+=pocongSpeed*2;
+    if(pocongY>py) pocongY-=pocongSpeed*2; else pocongY+=pocongSpeed*2;
+    let pc=document.getElementById('pocong'); pc.style.left=pocongX+'px'; pc.style.top=pocongY+'px';
+    let d=Math.abs(pocongX-px); document.getElementById('pocongDist').textContent=d<80?'DEKET BANGET!':d<150?'DEKET':'JAUH';
+    if(d<30){ gameOver=true; alert('💀 KETANGKEP POCONG! GAME OVER!'); location.reload(); }
+  }
+},100);
+updateHUD();
+</script>
+</body>
+</html>
